@@ -17,14 +17,14 @@ procedure Tests is
    end Check;
 
    --  Representative synthetic equirectangular environment map
-   Env_4x2 : Environment_Map (Width => 4, Height => 2) :=
+   Env_4x2 : constant Environment_Map (Width => 4, Height => 2) :=
      (Width  => 4,
       Height => 2,
       Data   => [1 => [(1.0, 0.5, 0.2), (0.8, 0.8, 0.8), (0.1, 0.2, 0.9), (0.5, 0.5, 0.5)],
                  2 => [(0.0, 0.0, 0.0), (0.2, 0.2, 0.2), (0.4, 0.4, 0.4), (0.1, 0.1, 0.1)]]);
 
    --  Uniform white environment map for analytic checks
-   White_Env : Environment_Map (Width => 4, Height => 2) :=
+   White_Env : constant Environment_Map (Width => 4, Height => 2) :=
      (Width  => 4,
       Height => 2,
       Data   => [others => [others => (1.0, 1.0, 1.0)]]);
@@ -43,7 +43,7 @@ begin
       Check ("1.3 Orthogonal dot product evaluates to 0.0", abs (DP - 0.0) < 1.0e-4);
    end;
 
-   --  TEST 2 — Normalization Exception on Degenerate Vector
+   --  TEST 2 — Normalization Zero-Length Vector Error Handling
    Put_Line ("TEST 2 — Normalization Zero-Length Vector Error Handling");
    declare
       Degenerate_V : constant Vector3 := (0.0, 0.0, 0.0);
@@ -61,7 +61,7 @@ begin
             Trapped := True;
       end;
       Check ("2.1 Invalid_Direction_Error trapped for zero vector", Trapped);
-      Check ("2.2 Trapped state verified true", Trapped = True);
+      Check ("2.2 Trapped state verified true", Trapped);
       Check ("2.3 Normal vector length constraint respected", Vector_Length ((1.0, 0.0, 0.0)) = 1.0);
    end;
 
@@ -93,7 +93,7 @@ begin
       Check ("4.3 Sample colors are non-negative", Sample_N.G >= 0.0 and Sample_S.G >= 0.0);
    end;
 
-   --  TEST 5 — Variant 1: Mirror Reflection Law (Snell / Specular)
+   --  TEST 5 — Mirror Reflection Mapping
    Put_Line ("TEST 5 — Mirror Reflection Mapping");
    declare
       Normal : constant Vector3 := (0.0, 1.0, 0.0);
@@ -105,7 +105,7 @@ begin
       Check ("5.3 Evaluated color blue channel in range", Color.B >= 0.0 and Color.B <= 1.0);
    end;
 
-   --  TEST 6 — Mirror Reflection with Perpendicular Ray
+   --  TEST 6 — Mirror Reflection Perpendicular Ray
    Put_Line ("TEST 6 — Mirror Reflection Perpendicular Ray");
    declare
       Normal : constant Vector3 := (0.0, 1.0, 0.0);
@@ -118,7 +118,7 @@ begin
       Check ("6.3 Blue channel matches direct bottom sample", abs (Color.B - Direct.B) < 1.0e-4);
    end;
 
-   --  TEST 7 — Variant 2: Diffuse Hemisphere Convolution
+   --  TEST 7 — Diffuse Hemisphere Irradiance Convolution
    Put_Line ("TEST 7 — Diffuse Hemisphere Irradiance Convolution");
    declare
       Up_Normal : constant Vector3 := (0.0, 1.0, 0.0);
@@ -130,7 +130,7 @@ begin
       Check ("7.3 Diffuse convolution balances G and B", abs (Irradiance.G - Irradiance.B) < 1.0e-2);
    end;
 
-   --  TEST 8 — Variant 3: Spherical Harmonics Projection
+   --  TEST 8 — Spherical Harmonics Projection
    Put_Line ("TEST 8 — Spherical Harmonics Projection");
    declare
       Coeffs : constant SH_Coefficients :=
@@ -144,7 +144,7 @@ begin
              abs (Coeffs (2).R) < 0.5);
    end;
 
-   --  TEST 9 — Variant 3: Spherical Harmonics Reconstruction
+   --  TEST 9 — Spherical Harmonics Reconstruction
    Put_Line ("TEST 9 — Spherical Harmonics Reconstruction");
    declare
       Coeffs : constant SH_Coefficients :=
@@ -158,7 +158,7 @@ begin
       Check ("9.3 Irradiance clamp ensures non-negative values", Reconstructed.B >= 0.0);
    end;
 
-   --  TEST 10 — Variant 4: Split-Sum Pre-filtered Environment Specular
+   --  TEST 10 — Split-Sum Pre-filtered Specular
    Put_Line ("TEST 10 — Split-Sum Pre-filtered Specular");
    declare
       Reflect_Dir : constant Vector3 := (0.0, 1.0, 0.0);
@@ -172,7 +172,7 @@ begin
       Check ("10.3 Pre-filtering converges without NaN or negative values", Rough_Spec.B >= 0.0);
    end;
 
-   --  TEST 11 — Variant 4: Split-Sum BRDF LUT Generation
+   --  TEST 11 — Precomputed BRDF Look-Up Table
    Put_Line ("TEST 11 — Precomputed BRDF Look-Up Table");
    declare
       Lut : constant BRDF_LUT := Precompute_BRDF_LUT (Size => 8);
@@ -184,7 +184,7 @@ begin
              Sample_Entry.Scale + Sample_Entry.Bias <= 2.0);
    end;
 
-   --  TEST 12 — Variant 4: Split-Sum Combination with Fresnel Schlick
+   --  TEST 12 — Split-Sum Specular Combination
    Put_Line ("TEST 12 — Split-Sum Specular Combination");
    declare
       Prefilt   : constant Color_RGB := (0.8, 0.8, 0.8);

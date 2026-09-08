@@ -15,6 +15,8 @@ is
    Pi     : constant Real := Ada.Numerics.Pi;
    Two_Pi : constant Real := 2.0 * Ada.Numerics.Pi;
 
+   type Word32 is mod 2**32;
+
    --  ======================================================================
    --  Vector and Color Operations
    --  ======================================================================
@@ -342,7 +344,7 @@ is
    --  ======================================================================
 
    function Radical_Inverse_VdC (Bits_In : Positive) return Real is
-      Bits : Long_Integer := Long_Integer (Bits_In);
+      Bits : Word32 := Word32 (Bits_In);
    begin
       --  Reverses 32 bits into van der Corput sequence
       Bits := ((Bits and 16#55555555#) * 2) or ((Bits and 16#AAAAAAAA#) / 2);

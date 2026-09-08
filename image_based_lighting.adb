@@ -69,10 +69,14 @@ is
       --  Polar angle from +Y axis (elevation)
       Theta := Arccos (Clamped_Y);
 
-      --  Azimuth angle in X-Z plane
-      Phi := Arctan (Y => Dir.Z, X => Dir.X);
-      if Phi < 0.0 then
-         Phi := Phi + Two_Pi;
+      --  Azimuth angle in X-Z plane with protection against (0.0, 0.0) at poles
+      if abs (Dir.X) < 1.0e-7 and then abs (Dir.Z) < 1.0e-7 then
+         Phi := 0.0;
+      else
+         Phi := Arctan (Y => Dir.Z, X => Dir.X);
+         if Phi < 0.0 then
+            Phi := Phi + Two_Pi;
+         end if;
       end if;
 
       return (Theta => Theta, Phi => Phi);
